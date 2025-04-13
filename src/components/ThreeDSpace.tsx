@@ -1,8 +1,8 @@
 
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame, Canvas } from '@react-three/fiber';
-import { Stars, OrbitControls, useTexture } from '@react-three/drei';
+import { Stars, OrbitControls, useTexture, Environment } from '@react-three/drei';
 
 interface PlanetProps {
   position: [number, number, number];
@@ -12,11 +12,13 @@ interface PlanetProps {
   hasRings?: boolean;
   ringColor?: string;
   ringSize?: number;
+  onClick?: () => void;
 }
 
-function Planet({ position, texturePath, size, rotationSpeed = 0.002, hasRings = false, ringColor = '#FFD700', ringSize = 1.8 }: PlanetProps) {
+function Planet({ position, texturePath, size, rotationSpeed = 0.002, hasRings = false, ringColor = '#FFD700', ringSize = 1.8, onClick }: PlanetProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const ringRef = useRef<THREE.Mesh>(null);
+  const [hovered, setHovered] = useState(false);
   const texture = useTexture(texturePath);
   
   useFrame(() => {
@@ -30,10 +32,26 @@ function Planet({ position, texturePath, size, rotationSpeed = 0.002, hasRings =
   });
   
   return (
-    <group position={position}>
+    <group 
+      position={position} 
+      onClick={onClick}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+    >
       <mesh ref={meshRef}>
         <sphereGeometry args={[size, 64, 64]} />
-        <meshStandardMaterial map={texture} />
+        <meshStandardMaterial 
+          map={texture} 
+          emissiveMap={texture}
+          emissiveIntensity={hovered ? 0.1 : 0}
+          emissive="#ffffff"
+        />
+        {hovered && (
+          <mesh>
+            <sphereGeometry args={[size * 1.05, 32, 32]} />
+            <meshBasicMaterial transparent opacity={0.1} color="#80CFFF" />
+          </mesh>
+        )}
       </mesh>
       
       {hasRings && (
@@ -51,12 +69,47 @@ function Planet({ position, texturePath, size, rotationSpeed = 0.002, hasRings =
   );
 }
 
+interface CloudLayerProps {
+  size: number;
+  speed: number;
+}
+
+function CloudLayer({ size, speed }: CloudLayerProps) {
+  const meshRef = useRef<THREE.Mesh>(null);
+  const cloudTexture = useTexture('/textures/earth_clouds.jpg');
+  
+  useFrame(() => {
+    if (meshRef.current) {
+      meshRef.current.rotation.y += speed;
+    }
+  });
+  
+  return (
+    <mesh ref={meshRef}>
+      <sphereGeometry args={[size * 1.02, 32, 32]} />
+      <meshStandardMaterial 
+        map={cloudTexture} 
+        transparent={true} 
+        opacity={0.4} 
+        side={THREE.DoubleSide}
+      />
+    </mesh>
+  );
+}
+
 interface SpaceSceneProps {
   activePlanet: string;
   isTransitioning: boolean;
+  onPlanetClick?: (planet: string) => void;
 }
 
-const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning }) => {
+const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning, onPlanetClick }) => {
+  const handlePlanetClick = (planet: string) => {
+    if (onPlanetClick && !isTransitioning) {
+      onPlanetClick(planet);
+    }
+  };
+  
   return (
     <Canvas style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
       <ambientLight intensity={0.2} />
@@ -72,20 +125,28 @@ const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning }
         speed={isTransitioning ? 20 : 1}
       />
       
-      {/* Sun */}
+      {/* Sun with glow */}
       <mesh position={[0, 0, -50]}>
         <sphereGeometry args={[8, 32, 32]} />
         <meshBasicMaterial color="#FDB813" />
         <pointLight position={[0, 0, 0]} intensity={1.5} distance={100} decay={2} />
       </mesh>
+      <mesh position={[0, 0, -50]}>
+        <sphereGeometry args={[8.5, 32, 32]} />
+        <meshBasicMaterial color="#FDB81380" transparent opacity={0.3} />
+      </mesh>
       
       {/* Planets */}
       {activePlanet === 'earth' && (
-        <Planet 
-          position={[0, 0, -15]} 
-          texturePath="/textures/earth.jpg" 
-          size={4} 
-        />
+        <group>
+          <Planet 
+            position={[0, 0, -15]} 
+            texturePath="/textures/earth.jpg" 
+            size={4}
+            onClick={() => handlePlanetClick('earth')}
+          />
+          <CloudLayer size={4} speed={0.0005} />
+        </group>
       )}
       
       {activePlanet === 'mars' && (
@@ -93,7 +154,8 @@ const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning }
           position={[0, 0, -15]} 
           texturePath="/textures/mars.jpg" 
           size={3} 
-          rotationSpeed={0.003} 
+          rotationSpeed={0.003}
+          onClick={() => handlePlanetClick('mars')}
         />
       )}
       
@@ -102,7 +164,8 @@ const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning }
           position={[0, 0, -20]} 
           texturePath="/textures/jupiter.jpg" 
           size={6} 
-          rotationSpeed={0.004} 
+          rotationSpeed={0.004}
+          onClick={() => handlePlanetClick('jupiter')}
         />
       )}
       
@@ -114,11 +177,12 @@ const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning }
           rotationSpeed={0.003}
           hasRings={true} 
           ringColor="#C7A96F"
-          ringSize={2.2} 
+          ringSize={2.2}
+          onClick={() => handlePlanetClick('saturn')}
         />
       )}
       
-      {/* Orbit controls */}
+      {/* Enhanced orbit controls */}
       <OrbitControls 
         enableZoom={true} 
         enablePan={true} 
@@ -127,7 +191,12 @@ const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning }
         minDistance={10}
         maxDistance={50}
         enabled={!isTransitioning}
+        autoRotate={false}
+        autoRotateSpeed={0.5}
       />
+      
+      {/* Environment lighting for better rendering */}
+      <Environment preset="night" />
     </Canvas>
   );
 };
