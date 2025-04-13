@@ -15,32 +15,42 @@ const LightspeedEffect: React.FC<LightspeedEffectProps> = ({ active, onComplete 
     const container = containerRef.current;
     container.innerHTML = '';
     
-    // Create star streaks for lightspeed effect
-    for (let i = 0; i < 100; i++) {
+    // Create star streaks for lightspeed effect - much more stars for immersive effect
+    for (let i = 0; i < 500; i++) {
       const star = document.createElement('div');
       star.className = 'lightspeed-star';
       
-      // Random position
+      // Random position covering the entire viewport
       const x = Math.random() * window.innerWidth;
       const y = Math.random() * window.innerHeight;
       
-      // Random width (streak length)
-      const width = Math.random() * 100 + 20;
+      // Variable width for more realistic effect
+      const width = Math.random() * 200 + 50;
       
       star.style.width = `${width}px`;
-      star.style.height = '1px';
+      star.style.height = `${Math.random() * 3 + 1}px`; // Variable height
       star.style.left = `${x}px`;
       star.style.top = `${y}px`;
-      star.style.animation = `lightspeed ${Math.random() * 1 + 0.5}s forwards`;
+      star.style.opacity = `${Math.random() * 0.8 + 0.2}`;
+      star.style.animation = `lightspeed ${Math.random() * 1.5 + 0.3}s forwards`;
       star.style.animationDelay = `${Math.random() * 0.3}s`;
+      
+      // Add color variation
+      const colors = ['#FFFFFF', '#8BE9FD', '#50FA7B', '#BD93F9', '#FF79C6'];
+      star.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
       
       container.appendChild(star);
     }
     
+    // Sound effect for lightspeed
+    const audio = new Audio('/lightspeed.mp3');
+    audio.volume = 0.5;
+    audio.play().catch(() => console.log('Audio playback prevented'));
+    
     // Trigger callback when animation is complete
     const timeout = setTimeout(() => {
       if (onComplete) onComplete();
-    }, 1500);
+    }, 2000);
     
     return () => clearTimeout(timeout);
   }, [active, onComplete]);

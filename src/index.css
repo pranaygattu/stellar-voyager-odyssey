@@ -32,6 +32,9 @@
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
     --ring: 212.7 26.8% 83.9%;
+    
+    --space-darker: #030014;
+    --space-dark: #0A0A1B;
   }
 
   * {
@@ -43,55 +46,55 @@
   }
   
   body {
-    @apply bg-space-darker text-foreground overflow-x-hidden;
+    @apply bg-space-darker text-foreground overflow-hidden;
     margin: 0;
     padding: 0;
   }
 }
 
+/* Lightspeed effect */
+.lightspeed-star {
+  position: absolute;
+  background-color: white;
+  height: 2px;
+  box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.8);
+  transform-origin: right;
+}
+
+@keyframes lightspeed {
+  0% {
+    transform: translateX(0) scaleX(0);
+    opacity: 0;
+  }
+  5% {
+    opacity: 1;
+  }
+  60% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(-100vw) scaleX(1.5);
+    opacity: 0;
+  }
+}
+
+/* Star field */
 .star {
   position: absolute;
   background-color: white;
   border-radius: 50%;
 }
 
-.lightspeed-star {
-  position: absolute;
-  background-color: white;
-  height: 2px;
-  width: 2px;
+@keyframes twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 1; }
 }
 
-.planet-section {
-  height: 100vh;
-  scroll-snap-align: start;
-}
-
-.control-panel {
-  background: linear-gradient(180deg, rgba(15,18,24,0) 0%, rgba(15,18,24,0.7) 40%, rgba(15,18,24,1) 100%);
-}
-
-.space-container {
-  scroll-snap-type: y mandatory;
-  overflow-y: scroll;
-  height: 100vh;
-  scroll-behavior: smooth;
-}
-
-/* Hide scrollbar for Chrome, Safari and Opera */
-.space-container::-webkit-scrollbar {
-  display: none;
-}
-
-/* Hide scrollbar for IE, Edge and Firefox */
-.space-container {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
-}
-
+/* Glow effects */
 .glow-button {
   position: relative;
   z-index: 1;
+  box-shadow: 0 0 20px rgba(30, 174, 219, 0.5);
 }
 
 .glow-button::before {
@@ -111,31 +114,28 @@
 
 .glow-button:hover::before {
   opacity: 1;
+  filter: blur(15px);
 }
 
-.earth-section {
-  background: radial-gradient(circle at right, rgba(30,174,219,0.1) 0%, rgba(15,18,24,1) 70%);
-}
-
-.mars-section {
-  background: radial-gradient(circle at right, rgba(255,100,50,0.1) 0%, rgba(15,18,24,1) 70%);
-}
-
-.jupiter-section {
-  background: radial-gradient(circle at right, rgba(255,180,100,0.1) 0%, rgba(15,18,24,1) 70%);
-}
-
-.saturn-section {
-  background: radial-gradient(circle at right, rgba(200,180,120,0.1) 0%, rgba(15,18,24,1) 70%);
-}
-
-@keyframes spin {
-  from {
-    transform: rotate(0);
+/* Animation utilities */
+@keyframes pulse-light {
+  0%, 100% {
+    opacity: 1;
+    box-shadow: 0 0 20px rgba(30, 174, 219, 0.5);
   }
-  to {
-    transform: rotate(360deg);
+  50% {
+    opacity: 0.8;
+    box-shadow: 0 0 30px rgba(30, 174, 219, 0.8);
   }
+}
+
+.animate-pulse-light {
+  animation: pulse-light 3s ease-in-out infinite;
+}
+
+/* Control panel */
+.control-panel {
+  background: linear-gradient(180deg, rgba(3,0,20,0) 0%, rgba(3,0,20,0.7) 40%, rgba(3,0,20,1) 100%);
 }
 
 .panel-item {
@@ -143,5 +143,21 @@
 }
 
 .panel-item:hover {
-  @apply border-blue-500/70 shadow-[0_0_10px_rgba(30,174,219,0.5)];
+  @apply border-blue-500/70;
+  box-shadow: 0 0 15px rgba(30,174,219,0.5);
+}
+
+/* Hide scrollbar */
+::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for Firefox */
+* {
+  scrollbar-width: none;
+}
+
+/* Three.js canvas */
+canvas {
+  touch-action: none;
 }
