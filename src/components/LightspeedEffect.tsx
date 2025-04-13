@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef } from 'react';
 
 interface LightspeedEffectProps {
@@ -16,7 +15,7 @@ const LightspeedEffect: React.FC<LightspeedEffectProps> = ({ active, onComplete 
     container.innerHTML = '';
     
     // Create star streaks for lightspeed effect - much more stars for immersive effect
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < 300; i++) {
       const star = document.createElement('div');
       star.className = 'lightspeed-star';
       
@@ -25,40 +24,53 @@ const LightspeedEffect: React.FC<LightspeedEffectProps> = ({ active, onComplete 
       const y = Math.random() * window.innerHeight;
       
       // Variable width for more realistic effect
-      const width = Math.random() * 200 + 50;
+      const width = Math.random() * 150 + 30;
       
       star.style.width = `${width}px`;
-      star.style.height = `${Math.random() * 3 + 1}px`; // Variable height
+      star.style.height = `${Math.random() * 2 + 1}px`; // Variable height
       star.style.left = `${x}px`;
       star.style.top = `${y}px`;
-      star.style.opacity = `${Math.random() * 0.8 + 0.2}`;
-      star.style.animation = `lightspeed ${Math.random() * 1.5 + 0.3}s forwards`;
-      star.style.animationDelay = `${Math.random() * 0.3}s`;
+      star.style.opacity = `${Math.random() * 0.7 + 0.3}`;
       
-      // Add color variation
-      const colors = ['#FFFFFF', '#8BE9FD', '#50FA7B', '#BD93F9', '#FF79C6'];
+      // Shorter animation duration for better performance
+      star.style.animation = `lightspeed ${Math.random() * 1 + 0.5}s forwards`;
+      star.style.animationDelay = `${Math.random() * 0.2}s`;
+      
+      // Add color variation - keeping mostly white for better visibility
+      const colors = ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#8BE9FD', '#50FA7B', '#BD93F9'];
       star.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
       
       container.appendChild(star);
     }
     
-    // Sound effect for lightspeed
-    const audio = new Audio('/lightspeed.mp3');
-    audio.volume = 0.5;
-    audio.play().catch(() => console.log('Audio playback prevented'));
+    // Sound effect for lightspeed - making it optional to prevent blocking
+    try {
+      const audio = new Audio('/lightspeed.mp3');
+      audio.volume = 0.3;
+      audio.play().catch(e => console.log('Audio playback prevented', e));
+    } catch (err) {
+      console.log('Audio not supported', err);
+    }
     
-    // Trigger callback when animation is complete
+    // Trigger callback when animation is complete with a safer approach
     const timeout = setTimeout(() => {
-      if (onComplete) onComplete();
+      if (onComplete && typeof onComplete === 'function') {
+        onComplete();
+      }
     }, 2000);
     
-    return () => clearTimeout(timeout);
+    return () => {
+      clearTimeout(timeout);
+      if (container) container.innerHTML = '';
+    };
   }, [active, onComplete]);
   
   return (
     <div 
       ref={containerRef} 
-      className={`fixed top-0 left-0 w-full h-full z-50 pointer-events-none ${!active ? 'hidden' : ''}`}
+      className={`fixed top-0 left-0 w-full h-full z-50 pointer-events-none ${active ? '' : 'hidden'}`}
+      data-testid="lightspeed-effect"
+      style={{ background: active ? 'rgba(0,0,0,0.5)' : 'transparent' }}
     />
   );
 };

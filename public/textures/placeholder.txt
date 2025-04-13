@@ -1,2 +1,10 @@
 
 This directory contains texture maps for the planets.
+
+Please ensure the following textures are present:
+- earth.jpg
+- mars.jpg
+- jupiter.jpg
+- saturn.jpg
+
+These are required for the 3D planet rendering.
