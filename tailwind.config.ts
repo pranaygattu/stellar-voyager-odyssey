@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -24,6 +25,12 @@ export default {
 				ring: 'hsl(var(--ring))',
 				background: 'hsl(var(--background))',
 				foreground: 'hsl(var(--foreground))',
+				space: {
+					dark: '#1A1F2C',
+					darker: '#0F1218',
+					light: '#E5DEFF',
+					accent: '#1EAEDB',
+				},
 				primary: {
 					DEFAULT: 'hsl(var(--primary))',
 					foreground: 'hsl(var(--primary-foreground))'
@@ -84,11 +91,41 @@ export default {
 					to: {
 						height: '0'
 					}
+				},
+				'rotate': {
+					'0%': {
+						transform: 'rotate(0deg)'
+					},
+					'100%': {
+						transform: 'rotate(360deg)'
+					}
+				},
+				'twinkle': {
+					'0%': { opacity: '0.2' },
+					'50%': { opacity: '1' },
+					'100%': { opacity: '0.2' }
+				},
+				'pulse-light': {
+					'0%': { opacity: '0.6', boxShadow: '0 0 5px rgba(255,255,255,0.5)' },
+					'50%': { opacity: '1', boxShadow: '0 0 20px rgba(255,255,255,0.8)' },
+					'100%': { opacity: '0.6', boxShadow: '0 0 5px rgba(255,255,255,0.5)' }
+				},
+				'lightspeed': {
+					'0%': { transform: 'translateX(0) scaleX(1)' },
+					'30%': { transform: 'translateX(80vw) scaleX(2.5)' },
+					'100%': { transform: 'translateX(100vw) scaleX(3)' }
 				}
 			},
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
-				'accordion-up': 'accordion-up 0.2s ease-out'
+				'accordion-up': 'accordion-up 0.2s ease-out',
+				'rotate-slow': 'rotate 20s linear infinite',
+				'rotate-medium': 'rotate 15s linear infinite',
+				'rotate-fast': 'rotate 8s linear infinite',
+				'twinkle': 'twinkle 3s ease-in-out infinite',
+				'twinkle-delayed': 'twinkle 3s ease-in-out 1s infinite',
+				'pulse-light': 'pulse-light 2s infinite',
+				'lightspeed': 'lightspeed 1.5s forwards',
 			}
 		}
 	},
