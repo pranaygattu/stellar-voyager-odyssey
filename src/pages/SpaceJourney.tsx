@@ -1,5 +1,5 @@
-
-import React, { useState, useRef, useEffect } from 'react';
+import * as React from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import ThreeDSpace from '@/components/ThreeDSpace';
 import LightspeedEffect from '@/components/LightspeedEffect';
@@ -110,10 +110,10 @@ const SpaceJourney: React.FC = () => {
       />
       
       {/* Lightspeed effect during transitions */}
-      <LightspeedEffect 
+      {/* <LightspeedEffect 
         active={isTransitioning} 
         onComplete={() => setIsTransitioning(false)} 
-      />
+      /> */}
       
       {/* Google Earth-like UI controls */}
       <div className="absolute top-4 left-4 z-30 flex space-x-2">

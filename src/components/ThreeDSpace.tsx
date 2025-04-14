@@ -1,5 +1,5 @@
-
-import React, { useRef, useEffect, useState } from 'react';
+import * as React from 'react';
+import { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame, Canvas } from '@react-three/fiber';
 import { Stars, OrbitControls, useTexture, Environment } from '@react-three/drei';
@@ -111,9 +111,19 @@ const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning, 
   };
   
   return (
-    <Canvas style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}>
-      <ambientLight intensity={0.2} />
-      <pointLight position={[0, 0, 0]} intensity={2.5} color="#FFFFFF" />
+    <Canvas 
+      style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }}
+      camera={{ position: [0, 0, 25], fov: 75 }}
+    >
+      <ambientLight intensity={0.5} />
+      <pointLight position={[0, 5, 10]} intensity={3} color="#FFFFFF" />
+      
+      {/* --- TEST CUBE --- */}
+      {/* <mesh position={[0, 0, 0]}>
+        <boxGeometry args={[2, 2, 2]} />
+        <meshStandardMaterial color="red" />
+      </mesh> */}
+      {/* --- END TEST CUBE --- */}
       
       {/* Dynamic stars background */}
       <Stars
@@ -145,7 +155,7 @@ const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning, 
             size={4}
             onClick={() => handlePlanetClick('earth')}
           />
-          <CloudLayer size={4} speed={0.0005} />
+          {/* <CloudLayer size={4} speed={0.0005} /> */}
         </group>
       )}
       
