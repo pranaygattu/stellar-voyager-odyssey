@@ -3,6 +3,7 @@ import { useRef, useEffect, useState } from 'react';
 import * as THREE from 'three';
 import { useFrame, Canvas } from '@react-three/fiber';
 import { Stars, OrbitControls, useTexture, Environment } from '@react-three/drei';
+import { EffectComposer, GodRays } from '@react-three/postprocessing';
 
 interface PlanetProps {
   position: [number, number, number];
@@ -97,6 +98,52 @@ function CloudLayer({ size, speed }: CloudLayerProps) {
   );
 }
 
+// New component for Earth and its orbiting Moon
+interface EarthSystemProps {
+  onPlanetClick: (planet: string) => void;
+}
+
+function EarthSystem({ onPlanetClick }: EarthSystemProps) {
+  const earthGroupRef = useRef<THREE.Group>(null);
+  const moonRef = useRef<THREE.Group>(null);
+  const orbitRadius = 6;
+  const orbitSpeed = 0.5;
+
+  useFrame(({ clock }) => {
+    // Orbit calculation for the Moon
+    if (moonRef.current) {
+      const elapsedTime = clock.getElapsedTime();
+      moonRef.current.position.x = Math.sin(elapsedTime * orbitSpeed) * orbitRadius;
+      moonRef.current.position.z = Math.cos(elapsedTime * orbitSpeed) * orbitRadius;
+      moonRef.current.rotation.y = elapsedTime * 0.1; 
+    }
+  });
+
+  return (
+    <group ref={earthGroupRef} position={[0, 0, -15]}> {/* Base position for the Earth system */}
+      {/* Earth Planet */}
+      <Planet 
+        position={[0, 0, 0]} // Relative to group
+        texturePath="/textures/earth.jpg" 
+        size={4}
+        onClick={() => onPlanetClick('earth')}
+      />
+      {/* Moon Orbiting Earth - Re-enabled */}
+      <group ref={moonRef}> 
+        <Planet 
+          position={[0, 0, 0]} // Position is controlled by useFrame
+          texturePath="/textures/moon.jpg" // Make sure this file exists!
+          size={1} 
+          rotationSpeed={0.005}
+          onClick={() => onPlanetClick('earth')} // Clicking moon focuses Earth
+        />
+      </group>
+      {/* Cloud layer remains commented out due to previous issues 
+      <CloudLayer size={4} speed={0.0005} /> */}
+    </group>
+  );
+}
+
 interface SpaceSceneProps {
   activePlanet: string;
   isTransitioning: boolean;
@@ -109,6 +156,13 @@ const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning, 
       onPlanetClick(planet);
     }
   };
+  
+  const sunRef = useRef<THREE.Mesh>(null); // Ref for the Sun mesh
+  
+  // Log sunRef after mount to check if it's assigned
+  useEffect(() => {
+    console.log("Sun Ref:", sunRef.current);
+  }, []);
   
   return (
     <Canvas 
@@ -125,88 +179,98 @@ const SpaceScene: React.FC<SpaceSceneProps> = ({ activePlanet, isTransitioning, 
       </mesh> */}
       {/* --- END TEST CUBE --- */}
       
-      {/* Dynamic stars background */}
-      <Stars
-        radius={100}
-        depth={50}
-        count={5000}
-        factor={4}
-        fade
-        speed={isTransitioning ? 20 : 1}
-      />
-      
-      {/* Sun with glow */}
-      <mesh position={[0, 0, -50]}>
-        <sphereGeometry args={[8, 32, 32]} />
-        <meshBasicMaterial color="#FDB813" />
-        <pointLight position={[0, 0, 0]} intensity={1.5} distance={100} decay={2} />
-      </mesh>
-      <mesh position={[0, 0, -50]}>
-        <sphereGeometry args={[8.5, 32, 32]} />
-        <meshBasicMaterial color="#FDB81380" transparent opacity={0.3} />
-      </mesh>
-      
-      {/* Planets */}
-      {activePlanet === 'earth' && (
-        <group>
+      <EffectComposer>
+        {/* Dynamic stars background */}
+        <Stars
+          radius={100}
+          depth={50}
+          count={5000}
+          factor={4}
+          fade
+          speed={isTransitioning ? 40 : 1}
+        />
+        
+        {/* Sun with glow - Moved further and made white/brighter */}
+        <mesh ref={sunRef} position={[0, 0, -300]}> 
+          <sphereGeometry args={[8, 32, 32]} />
+          <meshBasicMaterial color="#FFFFFF" /> 
+          <pointLight position={[0, 0, 0]} intensity={6} distance={400} decay={2} /> 
+        </mesh>
+        <mesh position={[0, 0, -300]}> 
+          <sphereGeometry args={[8.5, 32, 32]} />
+          <meshBasicMaterial color="#FFFFFF" transparent opacity={0.3} /> 
+        </mesh>
+        
+        {/* Planets */}
+        {activePlanet === 'earth' && (
+          <EarthSystem onPlanetClick={handlePlanetClick} />
+        )}
+        
+        {activePlanet === 'mars' && (
           <Planet 
             position={[0, 0, -15]} 
-            texturePath="/textures/earth.jpg" 
-            size={4}
-            onClick={() => handlePlanetClick('earth')}
+            texturePath="/textures/mars.jpg" 
+            size={3} 
+            rotationSpeed={0.003}
+            onClick={() => handlePlanetClick('mars')}
           />
-          {/* <CloudLayer size={4} speed={0.0005} /> */}
-        </group>
-      )}
-      
-      {activePlanet === 'mars' && (
-        <Planet 
-          position={[0, 0, -15]} 
-          texturePath="/textures/mars.jpg" 
-          size={3} 
-          rotationSpeed={0.003}
-          onClick={() => handlePlanetClick('mars')}
+        )}
+        
+        {activePlanet === 'jupiter' && (
+          <Planet 
+            position={[0, 0, -20]} 
+            texturePath="/textures/jupiter.jpg" 
+            size={6} 
+            rotationSpeed={0.004}
+            onClick={() => handlePlanetClick('jupiter')}
+          />
+        )}
+        
+        {activePlanet === 'saturn' && (
+          <Planet 
+            position={[0, 0, -20]} 
+            texturePath="/textures/saturn.jpg" 
+            size={5} 
+            rotationSpeed={0.003}
+            hasRings={true} 
+            ringColor="#C7A96F"
+            ringSize={2.2}
+            onClick={() => handlePlanetClick('saturn')}
+          />
+        )}
+        
+        {/* Enhanced orbit controls */}
+        <OrbitControls 
+          enableZoom={true} 
+          enablePan={true} 
+          enableRotate={true} 
+          zoomSpeed={0.6}
+          minDistance={10}
+          maxDistance={50}
+          enabled={!isTransitioning}
+          autoRotate={false}
+          autoRotateSpeed={0.5}
         />
-      )}
-      
-      {activePlanet === 'jupiter' && (
-        <Planet 
-          position={[0, 0, -20]} 
-          texturePath="/textures/jupiter.jpg" 
-          size={6} 
-          rotationSpeed={0.004}
-          onClick={() => handlePlanetClick('jupiter')}
-        />
-      )}
-      
-      {activePlanet === 'saturn' && (
-        <Planet 
-          position={[0, 0, -20]} 
-          texturePath="/textures/saturn.jpg" 
-          size={5} 
-          rotationSpeed={0.003}
-          hasRings={true} 
-          ringColor="#C7A96F"
-          ringSize={2.2}
-          onClick={() => handlePlanetClick('saturn')}
-        />
-      )}
-      
-      {/* Enhanced orbit controls */}
-      <OrbitControls 
-        enableZoom={true} 
-        enablePan={true} 
-        enableRotate={true} 
-        zoomSpeed={0.6}
-        minDistance={10}
-        maxDistance={50}
-        enabled={!isTransitioning}
-        autoRotate={false}
-        autoRotateSpeed={0.5}
-      />
-      
-      {/* Environment lighting for better rendering */}
-      <Environment preset="night" />
+        
+        {/* Environment lighting for better rendering */}
+        <Environment preset="night" />
+
+        {/* God Rays Effect - Requires sunRef to be assigned */}
+        {sunRef.current && (
+          <GodRays
+            sun={sunRef.current}
+            config={{
+              density: 0.97,
+              decay: 0.95,
+              weight: 1.5,
+              exposure: 1,
+              clampMax: 1,
+              samples: 100,
+              blur: false,
+            }}
+          />
+        )}
+      </EffectComposer>
     </Canvas>
   );
 };
