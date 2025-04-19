@@ -1,26 +1,15 @@
-# Welcome to your Lovable project
+# 🚀 Welcome to Your Space Adventure
 
-## Project info
+Embark on an interstellar journey through a sleek, modern frontend powered by Vite, TypeScript, and React. This project showcases rapid development, modular design, and stylish UI components.
 
-**URL**: https://lovable.dev/projects/0a72f8c2-9dc0-4495-b4de-c18bb77f35de
+🔗 **Live Project URL**: [View the Project](https://lovable.dev/projects/0a72f8c2-9dc0-4495-b4de-c18bb77f35de)
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🛠️ Project Setup
 
-**Use Lovable**
+Follow these steps to run the project locally:
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/0a72f8c2-9dc0-4495-b4de-c18bb77f35de) and start prompting.
-
-Changes made via Lovable will be committed automatically to this repo.
-
-**Use your preferred IDE**
-
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
 
 ```sh
 # Step 1: Clone the repository using the project's Git URL.
@@ -50,9 +39,10 @@ npm run dev
 - Click on "New codespace" to launch a new Codespace environment.
 - Edit files directly within the Codespace and commit and push your changes once you're done.
 
+
 ## What technologies are used for this project?
 
-This project is built with:
+Tech Stack:
 
 - Vite
 - TypeScript
@@ -60,14 +50,6 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
+Author: Pranay Kumar Gattu
 
-Simply open [Lovable](https://lovable.dev/projects/0a72f8c2-9dc0-4495-b4de-c18bb77f35de) and click on Share -> Publish.
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes it is!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
